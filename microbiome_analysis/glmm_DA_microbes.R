@@ -1,6 +1,10 @@
 ### glmmTMB functions
 ### Make note:
 
+### I designed these functions to be used with a melted dataframe with rows representing samples 
+### and columns representing taxa, counts of those taxa, 
+### and relevant metadata to explore how counts of those taxa vary in abundance across treatments or groups.
+
 ##### `fml` and `fml_list` are written in R as:
 
 # fml1 <- as.formula(paste("count", "~", paste(c("Age","offset(log(Library.Size))"), collapse = "+")))
@@ -17,9 +21,11 @@ library(MuMIn) ### Model Selection
 
 countZeros <- function(x) sum(x == 0)
 
-### This function runs glmmTMB with given formula `fml` and `data`, no zero-inflation parameter. 
-### It then uses `simulateResiduals` and `testGeneric` with the user-written function `countZeros` to test for zero-inflation in the model fit.
-### If p-value < 0.05, it reruns glmmTMB with the zero-inflation parameter. In both scenarios, it returns a glmmTMB fit object.
+### This function runs glmmTMB with given formula `fml` and `data`, with no zero-inflation parameter. 
+### It then uses `simulateResiduals` and `testGeneric` with the user-written function `countZeros` 
+### to test for zero-inflation in the model fit.
+### If p-value < 0.05, it reruns glmmTMB with the zero-inflation parameter. 
+### In both scenarios, it returns a glmmTMB fit object.
 
 glmm.fun <- function(fml, data) {
   fit <- glmmTMB(fml, zi = ~0, family = nbinom2, data = data)
@@ -32,7 +38,8 @@ glmm.fun <- function(fml, data) {
   }
 }
 
-### This function runs the `glmm.fun` function above. It takes a formula list `fml_list`, `data` and max delta AIC `delta.max` as inputs.
+### This function runs the `glmm.fun` function above. 
+### It takes a formula list `fml_list`, `data` and max delta AIC `delta.max` as inputs.
 ### It then runs `model.sel` and `get.models` to from DHARMa to select the best (below `delta.max`) and simplest models, 
 ### in this case, "fit1" or the firts forumal in the formula list.
 
